@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consumir Servicios Web</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+  </head>
+  <body class="container mt-4">
+    <h2>Servicio REST</h2>
+
+    <form id="restForm" onsubmit="crearPersona(); return false;" class="mb-4">
+      <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="dni">DNI:</label>
+        <input type="text" id="dni" class="form-control" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Crear Persona</button>
+    </form>
+
+    <pre id="restResponse"></pre>
+
+    <h2>Servicio SOAP</h2>
+
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>DNI</th>
+        </tr>
+      </thead>
+      <tbody id="soapTableBody"></tbody>
+    </table>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <script>
+      const restUrl = "http://localhost:8080/insertar_con_rest";
+      const soapUrl = "http://localhost:8888/consultar_con_soap";
+
+      function crearPersona() {
+        const nombre = document.getElementById("nombre").value;
+        const apellido = document.getElementById("apellido").value;
+        const dni = document.getElementById("dni").value;
+
+        const restData = {
+          nombres: nombre,
+          apellidos: apellido,
+          dni: dni,
+        };
+
+        fetch(restUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(restData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("restResponse").innerText = JSON.stringify(
+              data,
+              null,
+              2
+            );
+            // Actualizar la tabla SOAP después de agregar una persona
+            consultarServicioSOAP();
+          })
+          .catch((error) => {
+            (document.getElementById("restResponse").innerText =
+              "Error al crear la persona"),
+              error;
+            console.error("Error en el servicio REST:", error);
+          });
+      }
+
+      // Llama a consultarServicioSOAP() al cargar la página
+      consultarServicioSOAP();
+
+      function consultarServicioSOAP() {
+        const soapRequest = `
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="http://localhost:8888/consultar_con_soap">
+          <soapenv:Header/>
+          <soapenv:Body>
+            <tns:consultarPersonas/>
+          </soapenv:Body>
+        </soapenv:Envelope>
+      `;
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "text/xml");
+
+        const requestOptions = {
+          method: "POST",
+          headers: myHeaders,
+          body: soapRequest,
+          redirect: "follow",
+        };
+
+        fetch(soapUrl, requestOptions)
+          .then((response) => response.text())
+          .then((data) => {
+            // Actualizar la tabla de personas con la respuesta SOAP
+            actualizarTablaSOAP(data);
+          })
+          .catch((error) => {
+            console.error("Error al consultar el servicio SOAP:", error);
+            document.getElementById("soapResponse").innerText =
+              "Error al consultar el servicio SOAP";
+          });
+      }
+
+      function actualizarTablaSOAP(data) {
+        try {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(data, "text/xml");
+          const personas = xmlDoc.querySelectorAll("personas");
+
+          // Limpiar la tabla antes de actualizar
+          const tableBody = document.getElementById("soapTableBody");
+          tableBody.innerHTML = "";
+
+          // Actualizar la tabla con las personas
+          if (personas.length > 1) {
+            console.log(personas);
+            for (let i = 1; i < personas.length; i++) {
+              const persona = personas[i];
+              const id = persona.querySelector("id").textContent;
+              const nombre = persona.querySelector("nombres").textContent;
+              const apellido = persona.querySelector("apellidos").textContent;
+              const dni = persona.querySelector("dni").textContent;
+
+              // Agregar fila a la tabla
+              const row = tableBody.insertRow();
+              row.insertCell(0).innerText = id;
+              row.insertCell(1).innerText = nombre;
+              row.insertCell(2).innerText = apellido;
+              row.insertCell(3).innerText = dni;
+            }
+          }
+        } catch (error) {
+          console.error("Error al procesar la respuesta SOAP:", error);
+          document.getElementById("soapResponse").innerText =
+            "Error al procesar la respuesta SOAP";
+        }
+      }
+    </script>
+  </body>
+</html>

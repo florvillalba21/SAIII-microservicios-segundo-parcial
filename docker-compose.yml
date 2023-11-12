@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # MySQL Service
+  mysql:
+    image: mysql-image:latest
+    deploy:
+      replicas: 1
+    environment:
+      MYSQL_ROOT_PASSWORD: root1
+      MYSQL_DATABASE: prueba
+
+  # REST Service
+  rest-service:
+    image: rest-image:latest
+    deploy:
+      replicas: 1
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+
+  # SOAP Service
+  soap-service:
+    image: soap-image:latest
+    deploy:
+      replicas: 1
+    ports:
+      - "8888:8888"
+    depends_on:
+      - mysql
+
+  # Frontend Service
+  frontend:
+    image: nginx:latest
+    deploy:
+      replicas: 4
+    ports:
+      - "8081:80"
+    networks:
+      - my-network-saii
+    volumes:
+      - ./server/:/usr/share/nginx/html
+
+networks:
+  my-network-saii: {}
