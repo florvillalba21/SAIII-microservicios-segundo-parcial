@@ -32,6 +32,8 @@ docker swarm init
 ## Paso 2: Desplegar los servicios a partir de las imagenes
 docker stack deploy -c docker-compose.yml stack-villalba
 
+# NOTA: el servicio de la base de datos toma unos segundos más en estar activo, asi que los servicios de api tardarán unos segundos más antes de estar disponibles totalmente
+
 # Comprobar funcionamiento
 
 ## ingresar a un buscador, colocar la siguiente url:
