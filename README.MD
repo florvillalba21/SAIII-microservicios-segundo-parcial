@@ -21,9 +21,6 @@ docker build -t soap-image -f Dockerfile .
 ## Paso 4: Crear la imagen de la aplicación consumidora
 docker build -t app-consumer-image -f Dockerfile .
 
-## Paso 5: Iniciar los servicios con Docker Compose
-docker-compose up -d
-
 # Levantar servicios
 
 ## Paso 1: Iniciar  Docker Swarm
