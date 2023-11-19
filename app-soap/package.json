@@ -1,14 +1,15 @@
 {
-    "name": "app-soap",
-    "version": "1.0.0",
-    "main": "index.js",
-    "scripts": {
-        "start": "node index.js"
-    },
-    "dependencies": {
-        "cors": "^2.8.5",
-        "express": "^4.17.1",
-        "sequelize": "^6.6.5",
-        "soap": "^1.0.0"
-    }
+  "name": "app-soap",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "sequelize": "^6.6.5",
+    "mysql2": "^3.6.3",
+    "soap": "^1.0.0"
+  }
 }
