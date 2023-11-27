@@ -8,7 +8,7 @@ const sequelize = new Sequelize('prueba', 'root', 'root1', {
     dialect: 'mysql',
 });
 
-const Persona = sequelize.define('Persona', {
+const Persona = sequelize.define('Personas', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -32,11 +32,12 @@ app.use(express.json());
 app.post('/insertar_con_rest', async (req, res) => {
     try {
         const { apellidos, nombres, dni } = req.body;
+        console.log(req.body)
         const persona = await Persona.create({ apellidos, nombres, dni });
 
         res.status(200).json({ message: 'Persona insertada con éxito', persona });
     } catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).json({ error: 'Error al insertar en la base de datos' });
     }
 });
